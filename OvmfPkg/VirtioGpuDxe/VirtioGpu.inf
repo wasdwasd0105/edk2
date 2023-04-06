@@ -38,14 +38,11 @@
   UefiDriverEntryPoint
   UefiLib
   VirtioLib
+  FrameBufferBltLib
+  QemuFwCfgLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid     ## TO_START ## BY_START
   gEfiGraphicsOutputProtocolGuid ## BY_START
   gEfiPciIoProtocolGuid          ## TO_START
   gVirtioDeviceProtocolGuid      ## TO_START
-
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
