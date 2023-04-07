@@ -595,7 +595,9 @@ FvbWrite (
 
   Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  return NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
+  return EFI_SUCCESS;
+
+  //return NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
 }
 
 /**
@@ -648,98 +650,100 @@ FvbEraseBlocks (
   ...
   )
 {
-  EFI_STATUS          Status;
-  VA_LIST             Args;
-  UINTN               BlockAddress; // Physical address of Lba to erase
-  EFI_LBA             StartingLba;  // Lba from which we start erasing
-  UINTN               NumOfLba;     // Number of Lba blocks to erase
-  NOR_FLASH_INSTANCE  *Instance;
+  // EFI_STATUS          Status;
+  // VA_LIST             Args;
+  // UINTN               BlockAddress; // Physical address of Lba to erase
+  // EFI_LBA             StartingLba;  // Lba from which we start erasing
+  // UINTN               NumOfLba;     // Number of Lba blocks to erase
+  // NOR_FLASH_INSTANCE  *Instance;
 
-  Instance = INSTANCE_FROM_FVB_THIS (This);
+  // Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks()\n"));
+  // DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks()\n"));
 
-  Status = EFI_SUCCESS;
+  // Status = EFI_SUCCESS;
 
-  // Before erasing, check the entire list of parameters to ensure all specified blocks are valid
+  return EFI_SUCCESS;
 
-  VA_START (Args, This);
-  do {
-    // Get the Lba from which we start erasing
-    StartingLba = VA_ARG (Args, EFI_LBA);
+//   // Before erasing, check the entire list of parameters to ensure all specified blocks are valid
 
-    // Have we reached the end of the list?
-    if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
-      // Exit the while loop
-      break;
-    }
+//   VA_START (Args, This);
+//   do {
+//     // Get the Lba from which we start erasing
+//     StartingLba = VA_ARG (Args, EFI_LBA);
 
-    // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (Args, UINTN);
+//     // Have we reached the end of the list?
+//     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
+//       // Exit the while loop
+//       break;
+//     }
 
-    // All blocks must be within range
-    DEBUG ((
-      DEBUG_BLKIO,
-      "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%Lu - 1 ) > LastBlock=%ld.\n",
-      Instance->StartLba + StartingLba,
-      (UINT64)NumOfLba,
-      Instance->LastBlock
-      ));
-    if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->LastBlock)) {
-      VA_END (Args);
-      DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
-      Status = EFI_INVALID_PARAMETER;
-      goto EXIT;
-    }
-  } while (TRUE);
+//     // How many Lba blocks are we requested to erase?
+//     NumOfLba = VA_ARG (Args, UINTN);
 
-  VA_END (Args);
+//     // All blocks must be within range
+//     DEBUG ((
+//       DEBUG_BLKIO,
+//       "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%Lu - 1 ) > LastBlock=%ld.\n",
+//       Instance->StartLba + StartingLba,
+//       (UINT64)NumOfLba,
+//       Instance->LastBlock
+//       ));
+//     if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->LastBlock)) {
+//       VA_END (Args);
+//       DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
+//       Status = EFI_INVALID_PARAMETER;
+//       goto EXIT;
+//     }
+//   } while (TRUE);
 
-  //
-  // To get here, all must be ok, so start erasing
-  //
-  VA_START (Args, This);
-  do {
-    // Get the Lba from which we start erasing
-    StartingLba = VA_ARG (Args, EFI_LBA);
+//   VA_END (Args);
 
-    // Have we reached the end of the list?
-    if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
-      // Exit the while loop
-      break;
-    }
+//   //
+//   // To get here, all must be ok, so start erasing
+//   //
+//   VA_START (Args, This);
+//   do {
+//     // Get the Lba from which we start erasing
+//     StartingLba = VA_ARG (Args, EFI_LBA);
 
-    // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (Args, UINTN);
+//     // Have we reached the end of the list?
+//     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
+//       // Exit the while loop
+//       break;
+//     }
 
-    // Go through each one and erase it
-    while (NumOfLba > 0) {
-      // Get the physical address of Lba to erase
-      BlockAddress = GET_NOR_BLOCK_ADDRESS (
-                       Instance->RegionBaseAddress,
-                       Instance->StartLba + StartingLba,
-                       Instance->BlockSize
-                       );
+//     // How many Lba blocks are we requested to erase?
+//     NumOfLba = VA_ARG (Args, UINTN);
 
-      // Erase it
-      DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
-      Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
-      if (EFI_ERROR (Status)) {
-        VA_END (Args);
-        Status = EFI_DEVICE_ERROR;
-        goto EXIT;
-      }
+//     // Go through each one and erase it
+//     while (NumOfLba > 0) {
+//       // Get the physical address of Lba to erase
+//       BlockAddress = GET_NOR_BLOCK_ADDRESS (
+//                        Instance->RegionBaseAddress,
+//                        Instance->StartLba + StartingLba,
+//                        Instance->BlockSize
+//                        );
 
-      // Move to the next Lba
-      StartingLba++;
-      NumOfLba--;
-    }
-  } while (TRUE);
+//       // Erase it
+//       DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
+//       Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
+//       if (EFI_ERROR (Status)) {
+//         VA_END (Args);
+//         Status = EFI_DEVICE_ERROR;
+//         goto EXIT;
+//       }
 
-  VA_END (Args);
+//       // Move to the next Lba
+//       StartingLba++;
+//       NumOfLba--;
+//     }
+//   } while (TRUE);
 
-EXIT:
-  return Status;
+//   VA_END (Args);
+
+// EXIT:
+//   return Status;
 }
 
 /**

@@ -161,7 +161,7 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
   return EfiSetVariable (
            MTC_VARIABLE_NAME,
            &gMtcVendorGuid,
-           EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+           EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
            sizeof (UINT32),
            HighCount
            );
